@@ -184,6 +184,19 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="task-tags">Tags</label>
+          <input
+            type="text"
+            id="task-tags"
+            name="tags"
+            placeholder="Add tags (comma separated)"
+            aria-describedby="tags-help"
+          />
+          <span id="tags-help" class="help-text">Separate tags with commas (e.g., work, urgent, personal)</span>
+          <div id="tag-suggestions" class="tag-suggestions" hidden></div>
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" id="submit-btn">
             <span class="btn-text">Add Task</span>

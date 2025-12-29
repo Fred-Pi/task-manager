@@ -88,6 +88,11 @@ function createTaskElement(task) {
           </span>
         ` : ''}
       </div>
+      ${task.tags && task.tags.length > 0 ? `
+        <div class="task-tags">
+          ${task.tags.map(tag => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
+        </div>
+      ` : ''}
     </div>
 
     <div class="task-actions">
@@ -182,6 +187,7 @@ export function populateFormForEdit(task) {
   const titleInput = document.getElementById('task-title');
   const prioritySelect = document.getElementById('task-priority');
   const dueDateInput = document.getElementById('task-due-date');
+  const tagsInput = document.getElementById('task-tags');
   const submitBtn = document.getElementById('submit-btn');
   const cancelBtn = document.getElementById('cancel-edit');
 
@@ -194,6 +200,7 @@ export function populateFormForEdit(task) {
   if (titleInput) titleInput.value = task.title;
   if (prioritySelect) prioritySelect.value = task.priority;
   if (dueDateInput) dueDateInput.value = task.dueDate || '';
+  if (tagsInput) tagsInput.value = task.tags ? task.tags.join(', ') : '';
 
   // Update button states
   if (submitBtn) {
@@ -247,11 +254,22 @@ export function getFormData() {
   const titleInput = document.getElementById('task-title');
   const prioritySelect = document.getElementById('task-priority');
   const dueDateInput = document.getElementById('task-due-date');
+  const tagsInput = document.getElementById('task-tags');
+
+  // Parse tags from comma-separated string
+  let tags = [];
+  if (tagsInput && tagsInput.value.trim()) {
+    tags = tagsInput.value
+      .split(',')
+      .map(tag => tag.trim().toLowerCase())
+      .filter(tag => tag.length > 0 && tag.length <= 20);
+  }
 
   return {
     title: titleInput ? titleInput.value.trim() : '',
     priority: prioritySelect ? prioritySelect.value : 'medium',
-    dueDate: dueDateInput && dueDateInput.value ? dueDateInput.value : null
+    dueDate: dueDateInput && dueDateInput.value ? dueDateInput.value : null,
+    tags
   };
 }
 

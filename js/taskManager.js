@@ -24,6 +24,7 @@ export function createTask(taskData) {
     description: taskData.description ? sanitizeString(taskData.description) : '',
     priority: taskData.priority || 'medium',
     status: 'active',
+    tags: taskData.tags || [],
     dueDate: taskData.dueDate ? validateDate(taskData.dueDate) : null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
