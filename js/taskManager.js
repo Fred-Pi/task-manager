@@ -26,6 +26,8 @@ export function createTask(taskData) {
     status: 'active',
     tags: taskData.tags || [],
     dueDate: taskData.dueDate ? validateDate(taskData.dueDate) : null,
+    parentId: taskData.parentId || null,
+    subtasks: [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     completedAt: null
@@ -223,4 +225,89 @@ export function bulkDeleteTasks(taskIds) {
   });
 
   return count;
+}
+
+/**
+ * Create a subtask under a parent task
+ * @param {string} parentId - Parent task ID
+ * @param {Object} subtaskData - Subtask data
+ * @returns {Object} Created subtask
+ */
+export function createSubtask(parentId, subtaskData) {
+  const tasks = getTasks();
+  const parentTask = tasks.find(t => t.id === parentId);
+
+  if (!parentTask) {
+    throw new Error('Parent task not found');
+  }
+
+  // Create subtask with parent reference
+  const subtask = createTask({
+    ...subtaskData,
+    parentId: parentId
+  });
+
+  // Add subtask ID to parent's subtasks array
+  if (!parentTask.subtasks) {
+    parentTask.subtasks = [];
+  }
+  parentTask.subtasks.push(subtask.id);
+  parentTask.updatedAt = new Date().toISOString();
+
+  // Save updated parent
+  const taskIndex = tasks.findIndex(t => t.id === parentId);
+  tasks[taskIndex] = parentTask;
+  saveTasks(tasks);
+
+  return subtask;
+}
+
+/**
+ * Get all subtasks for a parent task
+ * @param {string} parentId - Parent task ID
+ * @returns {Array} Array of subtask objects
+ */
+export function getSubtasks(parentId) {
+  const tasks = getTasks();
+  return tasks.filter(t => t.parentId === parentId);
+}
+
+/**
+ * Update parent task status based on subtask completion
+ * @param {string} parentId - Parent task ID
+ */
+export function updateParentTaskProgress(parentId) {
+  const subtasks = getSubtasks(parentId);
+
+  if (subtasks.length === 0) {
+    return;
+  }
+
+  const allCompleted = subtasks.every(st => st.status === 'completed');
+  const anyCompleted = subtasks.some(st => st.status === 'completed');
+
+  // If all subtasks are completed, mark parent as completed
+  if (allCompleted) {
+    updateTask(parentId, { status: 'completed' });
+  } else if (anyCompleted) {
+    // If some subtasks are completed but not all, ensure parent is active
+    const parentTask = getTaskById(parentId);
+    if (parentTask && parentTask.status === 'completed') {
+      updateTask(parentId, { status: 'active' });
+    }
+  }
+}
+
+/**
+ * Get subtask completion statistics
+ * @param {string} parentId - Parent task ID
+ * @returns {Object} Completion stats {total, completed, percentage}
+ */
+export function getSubtaskStats(parentId) {
+  const subtasks = getSubtasks(parentId);
+  const total = subtasks.length;
+  const completed = subtasks.filter(st => st.status === 'completed').length;
+  const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  return { total, completed, percentage };
 }

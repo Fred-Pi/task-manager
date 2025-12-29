@@ -560,3 +560,76 @@
   border-top: 3px solid var(--color-primary);
   padding-top: calc(var(--spacing-md) - 3px);
 }
+
+/* Subtasks */
+.subtask-container {
+  margin-left: var(--spacing-2xl);
+  margin-top: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+  padding-left: var(--spacing-md);
+  border-left: 2px solid var(--color-border-light);
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.subtask-item:hover {
+  background-color: var(--color-bg-tertiary);
+  transform: translateX(2px);
+}
+
+.subtask-item.completed {
+  opacity: 0.6;
+}
+
+.subtask-item.completed .subtask-title {
+  text-decoration: line-through;
+  color: var(--color-text-tertiary);
+}
+
+.subtask-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.subtask-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.subtask-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.subtask-title {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.subtask-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.btn-sm {
+  padding: 4px;
+}
+
+.subtask-progress {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+}

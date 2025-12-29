@@ -1,7 +1,7 @@
 // Application Entry Point and Bootstrap
 
 import { initStorage, checkStorageAvailability, getSettings, saveSettings, getTasks, saveTasks, exportTasks, importTasks } from './storage.js';
-import { createTask, updateTask, deleteTask, toggleTaskStatus } from './taskManager.js';
+import { createTask, updateTask, deleteTask, toggleTaskStatus, createSubtask, updateParentTaskProgress } from './taskManager.js';
 import { filterAndSortTasks } from './filters.js';
 import { calculateStatistics } from './statistics.js';
 import {
@@ -136,6 +136,10 @@ function initEventListeners() {
     taskList.addEventListener('change', handleTaskListChange);
   }
 
+  // Subtask event delegation (for dynamically added subtask containers)
+  document.addEventListener('click', handleSubtaskClick);
+  document.addEventListener('change', handleSubtaskChange);
+
   // Status filter buttons
   const filterButtons = document.querySelectorAll('.filter-btn');
   filterButtons.forEach(btn => {
@@ -209,7 +213,7 @@ function handleCancelEdit() {
 }
 
 /**
- * Handle clicks on task list (edit, delete buttons)
+ * Handle clicks on task list (edit, delete, add-subtask buttons)
  * @param {Event} event - Click event
  */
 function handleTaskListClick(event) {
@@ -226,6 +230,9 @@ function handleTaskListClick(event) {
       break;
     case 'delete':
       handleDeleteTask(taskId);
+      break;
+    case 'add-subtask':
+      handleAddSubtask(taskId);
       break;
   }
 }
@@ -294,7 +301,14 @@ function handleDeleteTask(taskId) {
  */
 function handleToggleTaskStatus(taskId) {
   try {
+    const task = getTasks().find(t => t.id === taskId);
     const updatedTask = toggleTaskStatus(taskId);
+
+    // If this is a subtask, update parent progress
+    if (task && task.parentId) {
+      updateParentTaskProgress(task.parentId);
+    }
+
     const statusText = updatedTask.status === 'completed' ? 'completed' : 'active';
     announce(`Task marked as ${statusText}`);
     refreshApp();
@@ -303,6 +317,68 @@ function handleToggleTaskStatus(taskId) {
     showError('Failed to update task status');
     announce('Failed to update task status', 'assertive');
   }
+}
+
+/**
+ * Handle add subtask action
+ * @param {string} parentId - Parent task ID
+ */
+function handleAddSubtask(parentId) {
+  const subtaskTitle = prompt('Enter subtask title:');
+
+  if (!subtaskTitle || subtaskTitle.trim().length === 0) {
+    return;
+  }
+
+  try {
+    createSubtask(parentId, {
+      title: subtaskTitle.trim(),
+      priority: 'medium'
+    });
+    showSuccess('Subtask added successfully');
+    announce('Subtask added');
+    refreshApp();
+  } catch (error) {
+    console.error('Error creating subtask:', error);
+    showError(error.message || 'Failed to create subtask');
+    announce(error.message || 'Failed to create subtask', 'assertive');
+  }
+}
+
+/**
+ * Handle clicks on subtask elements
+ * @param {Event} event - Click event
+ */
+function handleSubtaskClick(event) {
+  const subtaskItem = event.target.closest('.subtask-item');
+  if (!subtaskItem) return;
+
+  const target = event.target.closest('[data-action]');
+  if (!target) return;
+
+  const action = target.dataset.action;
+  const taskId = subtaskItem.dataset.taskId;
+
+  switch (action) {
+    case 'edit':
+      handleEditTask(taskId);
+      break;
+    case 'delete':
+      handleDeleteTask(taskId);
+      break;
+  }
+}
+
+/**
+ * Handle changes on subtask checkboxes
+ * @param {Event} event - Change event
+ */
+function handleSubtaskChange(event) {
+  const subtaskItem = event.target.closest('.subtask-item');
+  if (!subtaskItem || event.target.type !== 'checkbox') return;
+
+  const taskId = subtaskItem.dataset.taskId;
+  handleToggleTaskStatus(taskId);
 }
 
 /**
