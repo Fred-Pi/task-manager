@@ -1,6 +1,6 @@
 // Application Entry Point and Bootstrap
 
-import { initStorage, checkStorageAvailability, getSettings, saveSettings, getTasks, exportTasks, importTasks } from './storage.js';
+import { initStorage, checkStorageAvailability, getSettings, saveSettings, getTasks, saveTasks, exportTasks, importTasks } from './storage.js';
 import { createTask, updateTask, deleteTask, toggleTaskStatus } from './taskManager.js';
 import { filterAndSortTasks } from './filters.js';
 import { calculateStatistics } from './statistics.js';
@@ -19,6 +19,7 @@ import { announce, initKeyboardNavigation } from './accessibility.js';
 import { getTodayDateString } from './utils.js';
 import { initTheme, setupThemeToggle } from './theme.js';
 import { initNotificationChecking, setupNotificationToggle } from './notifications.js';
+import { initDragDrop, makeTasksDraggable, reorderTasks } from './dragDrop.js';
 
 // Application state
 let currentFilter = 'all';
@@ -65,6 +66,12 @@ function init() {
 
   // Initialize keyboard navigation
   initKeyboardNavigation();
+
+  // Initialize drag and drop
+  initDragDrop();
+
+  // Listen for task reorder events
+  document.addEventListener('tasksReordered', handleTasksReordered);
 
   // Initial render
   refreshApp();
@@ -356,12 +363,40 @@ function refreshApp() {
   // Render tasks
   renderTaskList(filteredAndSortedTasks);
 
+  // Make tasks draggable
+  const taskList = document.getElementById('task-list');
+  if (taskList) {
+    makeTasksDraggable(taskList);
+  }
+
   // Calculate and render statistics (always based on all tasks)
   const stats = calculateStatistics(allTasks);
   renderStatistics(stats);
 
   // Update filter UI
   updateFilterUI(currentFilter);
+}
+
+/**
+ * Handle tasks reordered event
+ * @param {CustomEvent} event - Reorder event
+ */
+function handleTasksReordered(event) {
+  try {
+    const newOrder = event.detail.getNewOrder();
+    const allTasks = getTasks();
+
+    // Reorder tasks based on new DOM order
+    const reorderedTasks = reorderTasks(allTasks, newOrder);
+
+    // Save to storage
+    saveTasks(reorderedTasks);
+
+    announce('Tasks reordered');
+  } catch (error) {
+    console.error('Error reordering tasks:', error);
+    showError('Failed to save new order');
+  }
 }
 
 // Initialize app when DOM is ready

@@ -545,3 +545,18 @@
   border-color: var(--color-primary-light);
   color: var(--color-primary-light);
 }
+
+/* Drag and Drop States */
+.task-item[draggable="true"] {
+  cursor: move;
+}
+
+.task-item.dragging {
+  opacity: 0.4;
+  transform: scale(0.98);
+}
+
+.task-item.drag-over {
+  border-top: 3px solid var(--color-primary);
+  padding-top: calc(var(--spacing-md) - 3px);
+}
