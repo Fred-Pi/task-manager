@@ -40,6 +40,11 @@
   white-space: nowrap;
 }
 
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
 .btn:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
@@ -482,4 +487,20 @@
   .filter-btn.active {
     border-width: 2px;
   }
+}
+
+/* Data Actions */
+.data-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.import-label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.import-label input[type="file"] {
+  display: none;
 }

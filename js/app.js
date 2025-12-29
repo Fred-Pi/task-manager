@@ -1,6 +1,6 @@
 // Application Entry Point and Bootstrap
 
-import { initStorage, checkStorageAvailability, getSettings, saveSettings, getTasks } from './storage.js';
+import { initStorage, checkStorageAvailability, getSettings, saveSettings, getTasks, exportTasks, importTasks } from './storage.js';
 import { createTask, updateTask, deleteTask, toggleTaskStatus } from './taskManager.js';
 import { filterAndSortTasks } from './filters.js';
 import { calculateStatistics } from './statistics.js';
@@ -138,6 +138,18 @@ function initEventListeners() {
   const sortBy = document.getElementById('sort-by');
   if (sortBy) {
     sortBy.addEventListener('change', handleSortChange);
+  }
+
+  // Export button
+  const exportBtn = document.getElementById('export-btn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', handleExportTasks);
+  }
+
+  // Import file input
+  const importFile = document.getElementById('import-file');
+  if (importFile) {
+    importFile.addEventListener('change', handleImportTasks);
   }
 }
 
@@ -354,3 +366,36 @@ if (document.readyState === 'loading') {
 
 // Export for potential external use
 export { refreshApp };
+
+/**
+ * Handle export tasks
+ */
+function handleExportTasks() {
+  const tasks = getTasks();
+  exportTasks(tasks);
+  showSuccess(`Exported ${tasks.length} tasks`);
+  announce(`${tasks.length} tasks exported`);
+}
+
+/**
+ * Handle import tasks
+ * @param {Event} event - Change event
+ */
+async function handleImportTasks(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  try {
+    const importCount = await importTasks(file);
+    showSuccess(`Imported ${importCount} new tasks`);
+    announce(`${importCount} tasks imported`);
+    refreshApp();
+  } catch (error) {
+    console.error('Import error:', error);
+    showError(error.message);
+    announce(error.message, 'assertive');
+  } finally {
+    // Clear the file input so the same file can be imported again
+    event.target.value = '';
+  }
+}

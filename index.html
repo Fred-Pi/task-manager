@@ -123,6 +123,19 @@
           <option value="createdAt">Created Date</option>
         </select>
       </div>
+
+      <div class="filter-group">
+        <label>Data Management</label>
+        <div class="data-actions">
+          <button type="button" id="export-btn" class="btn btn-secondary btn-sm">
+            Export Tasks
+          </button>
+          <label for="import-file" class="btn btn-secondary btn-sm import-label">
+            Import Tasks
+            <input type="file" id="import-file" accept=".json" hidden />
+          </label>
+        </div>
+      </div>
     </aside>
 
     <!-- Task Input Form -->

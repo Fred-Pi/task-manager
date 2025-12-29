@@ -211,6 +211,51 @@ export function exportTasks(tasks) {
 }
 
 /**
+ * Import tasks from JSON file
+ * @param {File} file - JSON file to import
+ * @returns {Promise<number>} Number of tasks imported
+ */
+export function importTasks(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      try {
+        const importedTasks = JSON.parse(e.target.result);
+
+        if (!Array.isArray(importedTasks)) {
+          throw new Error('Invalid file format: expected array of tasks');
+        }
+
+        // Validate and merge with existing tasks
+        const existingTasks = getTasks();
+        const existingIds = new Set(existingTasks.map(t => t.id));
+        let importCount = 0;
+
+        importedTasks.forEach(task => {
+          // Skip if task already exists
+          if (!existingIds.has(task.id)) {
+            // Validate required fields
+            if (task.title && task.id) {
+              existingTasks.push(task);
+              importCount++;
+            }
+          }
+        });
+
+        saveTasks(existingTasks);
+        resolve(importCount);
+      } catch (error) {
+        reject(new Error(`Failed to import tasks: ${error.message}`));
+      }
+    };
+
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsText(file);
+  });
+}
+
+/**
  * Handle storage errors
  * @param {Error} error - Error object
  * @returns {Object} Initial data structure
