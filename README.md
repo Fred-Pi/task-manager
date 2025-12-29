@@ -4,17 +4,28 @@ A modern, accessible personal task management web application built with vanilla
 
 ## Features
 
-- **Task Management**: Create, edit, delete, and toggle task completion
+### Core Task Management
+- **Task CRUD Operations**: Create, edit, delete, and toggle task completion
 - **Priority Levels**: Assign high, medium, or low priority to tasks
 - **Due Dates**: Set and track due dates for tasks
+- **Task Tags**: Organize tasks with comma-separated tags
+- **Subtasks**: Break down tasks into smaller sub-tasks with progress tracking
+- **Recurring Tasks**: Automatically create tasks that repeat daily, weekly, or monthly
+
+### Organization & Viewing
 - **Filtering**: Filter tasks by status (all, active, completed) and priority
 - **Sorting**: Sort tasks by due date, priority, or creation date
+- **Drag & Drop Reordering**: Reorder tasks with intuitive drag and drop
+- **Calendar View**: Visualize tasks on a monthly calendar with color-coded priorities
 - **Statistics Dashboard**: View comprehensive statistics including:
   - Total tasks
   - Active and completed counts
   - Completion rate
   - Overdue tasks
+
+### User Experience
 - **Dark Mode**: Toggle between light and dark themes with localStorage persistence
+- **Browser Notifications**: Get notified about tasks due soon, due today, or overdue
 - **Data Export/Import**: Export tasks as JSON for backup, import tasks from JSON files
 - **Responsive Design**: Works seamlessly on mobile, tablet, and desktop
 - **Accessibility**: WCAG compliant with keyboard navigation and screen reader support
@@ -87,6 +98,69 @@ Use the "Sort By" dropdown to sort tasks by:
 - **Priority**: High priority tasks appear first
 - **Created Date**: Newest or oldest first
 
+### Adding Tags
+
+1. When creating or editing a task, enter tags in the "Tags" field
+2. Separate multiple tags with commas (e.g., "work, urgent, meeting")
+3. Tags are automatically converted to lowercase
+4. Tags appear as colored badges on tasks
+
+### Working with Subtasks
+
+1. Click the "+" icon on any task to add a subtask
+2. Enter the subtask title in the prompt
+3. Subtasks appear indented below their parent task
+4. Parent tasks show completion progress (e.g., "2/5")
+5. Parent task auto-completes when all subtasks are done
+
+### Creating Recurring Tasks
+
+1. When creating or editing a task, check "Recurring Task"
+2. Select the repeat frequency (Daily, Weekly, or Monthly)
+3. Set the interval (e.g., every 2 weeks)
+4. When you complete the task, the next occurrence is automatically created
+5. Recurring tasks show a rotating icon indicator
+
+### Reordering Tasks
+
+- Click and hold on any task to drag it
+- Drop it in the desired position
+- The new order is automatically saved
+
+### Using Calendar View
+
+1. Click "Show Calendar" to switch to calendar view
+2. Navigate months using the arrow buttons or "Today" button
+3. Tasks appear on their due dates with priority color-coding
+4. Click on any day to see all tasks scheduled for that date
+5. Click "Show Task List" to return to list view
+
+### Browser Notifications
+
+1. Check "Enable Notifications" in the sidebar
+2. Grant notification permission when prompted
+3. You'll receive notifications for:
+   - Tasks due within 1 hour
+   - Tasks due today
+   - Overdue tasks
+4. Notifications check automatically every 30 minutes
+
+### Dark Mode
+
+- Click the moon/sun icon in the header to toggle dark mode
+- Your preference is saved and remembered
+
+### Export/Import Data
+
+**Export:**
+1. Click "Export Tasks" in the sidebar
+2. A JSON file will be downloaded with all your tasks
+
+**Import:**
+1. Click "Import Tasks" in the sidebar
+2. Select a JSON file exported from this app
+3. Tasks are imported without creating duplicates
+
 ## Keyboard Shortcuts
 
 - **N**: Focus on new task input
@@ -108,11 +182,15 @@ main/
 ├── js/
 │   ├── app.js            # Application entry point
 │   ├── storage.js        # localStorage management
-│   ├── taskManager.js    # Task CRUD operations
+│   ├── taskManager.js    # Task CRUD operations and subtasks
 │   ├── ui.js             # DOM rendering
 │   ├── filters.js        # Filtering and sorting logic
 │   ├── statistics.js     # Statistics calculations
 │   ├── accessibility.js  # Accessibility features
+│   ├── theme.js          # Dark mode management
+│   ├── notifications.js  # Browser notifications
+│   ├── dragDrop.js       # Drag and drop reordering
+│   ├── calendar.js       # Calendar view
 │   └── utils.js          # Utility functions
 └── README.md             # This file
 ```
@@ -123,9 +201,13 @@ main/
 
 The application follows a modular architecture with clear separation of concerns:
 
-- **Storage Layer** (`storage.js`): Handles all localStorage operations
-- **Business Logic** (`taskManager.js`): Manages task CRUD operations
+- **Storage Layer** (`storage.js`): Handles all localStorage operations and data import/export
+- **Business Logic** (`taskManager.js`): Manages task CRUD operations, subtasks, and recurring tasks
 - **View Layer** (`ui.js`): Handles DOM manipulation and rendering
+- **Calendar** (`calendar.js`): Calendar view rendering and navigation
+- **Drag & Drop** (`dragDrop.js`): Drag and drop functionality for task reordering
+- **Theme Management** (`theme.js`): Dark mode toggle and persistence
+- **Notifications** (`notifications.js`): Browser notification scheduling and management
 - **Utilities** (`utils.js`, `filters.js`, `statistics.js`): Reusable helper functions
 - **Accessibility** (`accessibility.js`): ARIA labels, keyboard navigation, screen reader support
 - **Bootstrap** (`app.js`): Initializes the app and wires everything together
@@ -141,7 +223,11 @@ Each task has the following structure:
   description: string,     // Optional description
   priority: string,        // 'low' | 'medium' | 'high'
   status: string,          // 'active' | 'completed'
+  tags: array,             // Array of tag strings
   dueDate: string | null,  // ISO 8601 date (YYYY-MM-DD)
+  parentId: string | null, // Parent task ID (for subtasks)
+  subtasks: array,         // Array of subtask IDs
+  recurring: object | null,// { frequency: 'daily'|'weekly'|'monthly', interval: number }
   createdAt: string,       // ISO 8601 timestamp
   updatedAt: string,       // ISO 8601 timestamp
   completedAt: string | null // ISO 8601 timestamp
@@ -203,15 +289,16 @@ The app automatically offers to export your tasks as JSON before clearing data w
 
 Potential features for future versions:
 
-- Task categories/tags
-- Subtasks
-- Recurring tasks
-- Browser notifications for due dates
-- Calendar view
-- Drag and drop task reordering
 - Task search functionality
 - Bulk task operations
+- Task attachments
+- Task comments/notes
 - Cloud synchronization
+- Collaboration features
+- Time tracking
+- Pomodoro timer integration
+- Task dependencies
+- Gantt chart view
 
 ## License
 
