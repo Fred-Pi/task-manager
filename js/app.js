@@ -17,6 +17,7 @@ import {
 } from './ui.js';
 import { announce, initKeyboardNavigation } from './accessibility.js';
 import { getTodayDateString } from './utils.js';
+import { initTheme, setupThemeToggle } from './theme.js';
 
 // Application state
 let currentFilter = 'all';
@@ -37,6 +38,9 @@ function init() {
   // Initialize storage
   initStorage();
 
+  // Initialize theme
+  initTheme();
+
   // Load saved settings
   loadSettings();
 
@@ -48,6 +52,9 @@ function init() {
 
   // Initialize event listeners
   initEventListeners();
+
+  // Setup theme toggle
+  setupThemeToggle();
 
   // Initialize keyboard navigation
   initKeyboardNavigation();

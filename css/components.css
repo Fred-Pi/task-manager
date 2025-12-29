@@ -1,5 +1,27 @@
 /* Component Styles */
 
+/* Theme Toggle */
+.theme-toggle {
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-sm);
+}
+
+.theme-toggle .sun-icon {
+  display: none;
+}
+
+.theme-toggle .moon-icon {
+  display: block;
+}
+
+.dark-mode .theme-toggle .sun-icon {
+  display: block;
+}
+
+.dark-mode .theme-toggle .moon-icon {
+  display: none;
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;

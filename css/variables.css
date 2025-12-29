@@ -127,7 +127,7 @@
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light-mode) {
     --color-bg-primary: #111827;
     --color-bg-secondary: #1f2937;
     --color-bg-tertiary: #374151;
@@ -145,6 +145,26 @@
     --color-priority-medium-bg: #78350f;
     --color-priority-low-bg: #064e3b;
   }
+}
+
+/* Dark Mode Class (Manual Toggle) */
+.dark-mode {
+  --color-bg-primary: #111827;
+  --color-bg-secondary: #1f2937;
+  --color-bg-tertiary: #374151;
+  --color-bg-hover: #4b5563;
+
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #d1d5db;
+  --color-text-tertiary: #9ca3af;
+  --color-text-inverse: #111827;
+
+  --color-border: #4b5563;
+  --color-border-light: #374151;
+
+  --color-priority-high-bg: #7f1d1d;
+  --color-priority-medium-bg: #78350f;
+  --color-priority-low-bg: #064e3b;
 }
 
 /* Reduced Motion */

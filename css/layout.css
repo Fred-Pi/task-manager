@@ -39,8 +39,19 @@
 
 /* Header */
 .app-header {
-  text-align: center;
   padding: var(--spacing-lg) 0;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.header-text {
+  text-align: center;
+  flex: 1;
 }
 
 .app-header h1 {
