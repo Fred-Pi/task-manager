@@ -1,0 +1,16 @@
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "Personal task management web application",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "start": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "task-manager",
+    "todo",
+    "productivity"
+  ],
+  "author": "",
+  "license": "MIT"
+}
