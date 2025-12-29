@@ -96,7 +96,7 @@ Use the "Sort By" dropdown to sort tasks by:
 ## Project Structure
 
 ```
-claude-one/
+main/
 ├── index.html              # Main HTML file
 ├── css/
 │   ├── reset.css          # CSS normalization
