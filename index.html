@@ -197,6 +197,39 @@
           <div id="tag-suggestions" class="tag-suggestions" hidden></div>
         </div>
 
+        <div class="form-group">
+          <label class="toggle-label">
+            <input type="checkbox" id="recurring-toggle" />
+            <span>Recurring Task</span>
+          </label>
+        </div>
+
+        <div id="recurring-options" class="recurring-options" hidden>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="recurring-frequency">Repeat</label>
+              <select id="recurring-frequency" name="frequency">
+                <option value="daily">Daily</option>
+                <option value="weekly" selected>Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="recurring-interval">Every</label>
+              <input
+                type="number"
+                id="recurring-interval"
+                name="interval"
+                min="1"
+                max="365"
+                value="1"
+              />
+            </div>
+          </div>
+          <span class="help-text" id="recurring-help">Task will auto-create next occurrence when completed</span>
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" id="submit-btn">
             <span class="btn-text">Add Task</span>

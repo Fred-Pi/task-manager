@@ -1,7 +1,7 @@
 // Application Entry Point and Bootstrap
 
 import { initStorage, checkStorageAvailability, getSettings, saveSettings, getTasks, saveTasks, exportTasks, importTasks } from './storage.js';
-import { createTask, updateTask, deleteTask, toggleTaskStatus, createSubtask, updateParentTaskProgress } from './taskManager.js';
+import { createTask, updateTask, deleteTask, toggleTaskStatus, createSubtask, updateParentTaskProgress, toggleTaskStatusWithRecurrence } from './taskManager.js';
 import { filterAndSortTasks } from './filters.js';
 import { calculateStatistics } from './statistics.js';
 import {
@@ -169,6 +169,23 @@ function initEventListeners() {
   if (importFile) {
     importFile.addEventListener('change', handleImportTasks);
   }
+
+  // Recurring toggle
+  const recurringToggle = document.getElementById('recurring-toggle');
+  if (recurringToggle) {
+    recurringToggle.addEventListener('change', handleRecurringToggle);
+  }
+}
+
+/**
+ * Handle recurring toggle change
+ * @param {Event} event - Change event
+ */
+function handleRecurringToggle(event) {
+  const recurringOptions = document.getElementById('recurring-options');
+  if (recurringOptions) {
+    recurringOptions.hidden = !event.target.checked;
+  }
 }
 
 /**
@@ -302,7 +319,11 @@ function handleDeleteTask(taskId) {
 function handleToggleTaskStatus(taskId) {
   try {
     const task = getTasks().find(t => t.id === taskId);
-    const updatedTask = toggleTaskStatus(taskId);
+
+    // Use toggleTaskStatusWithRecurrence for recurring tasks
+    const result = toggleTaskStatusWithRecurrence(taskId);
+    const updatedTask = result.updatedTask;
+    const nextTask = result.nextTask;
 
     // If this is a subtask, update parent progress
     if (task && task.parentId) {
@@ -311,6 +332,12 @@ function handleToggleTaskStatus(taskId) {
 
     const statusText = updatedTask.status === 'completed' ? 'completed' : 'active';
     announce(`Task marked as ${statusText}`);
+
+    // Show message if next recurrence was created
+    if (nextTask) {
+      showSuccess(`Task completed! Next occurrence created for ${nextTask.dueDate}`);
+    }
+
     refreshApp();
   } catch (error) {
     console.error('Error toggling task status:', error);

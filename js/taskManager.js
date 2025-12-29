@@ -28,6 +28,7 @@ export function createTask(taskData) {
     dueDate: taskData.dueDate ? validateDate(taskData.dueDate) : null,
     parentId: taskData.parentId || null,
     subtasks: [],
+    recurring: taskData.recurring || null, // { frequency: 'daily'|'weekly'|'monthly', interval: number }
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     completedAt: null
@@ -310,4 +311,90 @@ export function getSubtaskStats(parentId) {
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return { total, completed, percentage };
+}
+
+/**
+ * Calculate next occurrence date based on recurrence pattern
+ * @param {Object} task - Task with recurring property
+ * @returns {string|null} Next due date in ISO format
+ */
+export function calculateNextOccurrence(task) {
+  if (!task.recurring || !task.dueDate) {
+    return null;
+  }
+
+  const currentDue = new Date(task.dueDate);
+  const { frequency, interval = 1 } = task.recurring;
+
+  let nextDate = new Date(currentDue);
+
+  switch (frequency) {
+    case 'daily':
+      nextDate.setDate(nextDate.getDate() + interval);
+      break;
+    case 'weekly':
+      nextDate.setDate(nextDate.getDate() + (7 * interval));
+      break;
+    case 'monthly':
+      nextDate.setMonth(nextDate.getMonth() + interval);
+      break;
+    default:
+      return null;
+  }
+
+  // Return in YYYY-MM-DD format
+  return nextDate.toISOString().split('T')[0];
+}
+
+/**
+ * Create next recurrence of a recurring task
+ * @param {Object} task - Completed recurring task
+ * @returns {Object|null} New task or null if not recurring
+ */
+export function createNextRecurrence(task) {
+  if (!task.recurring) {
+    return null;
+  }
+
+  const nextDueDate = calculateNextOccurrence(task);
+  if (!nextDueDate) {
+    return null;
+  }
+
+  // Create new task with same properties but new due date
+  const newTask = createTask({
+    title: task.title,
+    description: task.description,
+    priority: task.priority,
+    tags: task.tags,
+    dueDate: nextDueDate,
+    recurring: task.recurring
+  });
+
+  return newTask;
+}
+
+/**
+ * Toggle task status and handle recurrence
+ * @param {string} id - Task ID
+ * @returns {Object} Updated task info
+ */
+export function toggleTaskStatusWithRecurrence(id) {
+  const task = getTaskById(id);
+
+  if (!task) {
+    throw new Error('Task not found');
+  }
+
+  const newStatus = task.status === 'active' ? 'completed' : 'active';
+  const updatedTask = updateTask(id, { status: newStatus });
+
+  let nextTask = null;
+
+  // If task is being completed and is recurring, create next occurrence
+  if (newStatus === 'completed' && task.recurring && !task.parentId) {
+    nextTask = createNextRecurrence(task);
+  }
+
+  return { updatedTask, nextTask };
 }

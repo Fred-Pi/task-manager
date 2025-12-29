@@ -110,6 +110,14 @@ function createTaskElement(task) {
             ${stats.completed}/${stats.total}
           </span>
         ` : ''}
+        ${task.recurring ? `
+          <span class="recurring-indicator" aria-label="Recurring ${task.recurring.frequency}" title="Repeats ${task.recurring.frequency}${task.recurring.interval > 1 ? ' (every ' + task.recurring.interval + ')' : ''}">
+            <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+            </svg>
+            ${task.recurring.frequency}
+          </span>
+        ` : ''}
       </div>
       ${task.tags && task.tags.length > 0 ? `
         <div class="task-tags">
@@ -297,6 +305,10 @@ export function populateFormForEdit(task) {
   const prioritySelect = document.getElementById('task-priority');
   const dueDateInput = document.getElementById('task-due-date');
   const tagsInput = document.getElementById('task-tags');
+  const recurringToggle = document.getElementById('recurring-toggle');
+  const recurringOptions = document.getElementById('recurring-options');
+  const recurringFrequency = document.getElementById('recurring-frequency');
+  const recurringInterval = document.getElementById('recurring-interval');
   const submitBtn = document.getElementById('submit-btn');
   const cancelBtn = document.getElementById('cancel-edit');
 
@@ -310,6 +322,17 @@ export function populateFormForEdit(task) {
   if (prioritySelect) prioritySelect.value = task.priority;
   if (dueDateInput) dueDateInput.value = task.dueDate || '';
   if (tagsInput) tagsInput.value = task.tags ? task.tags.join(', ') : '';
+
+  // Populate recurring fields
+  if (recurringToggle && task.recurring) {
+    recurringToggle.checked = true;
+    if (recurringOptions) recurringOptions.hidden = false;
+    if (recurringFrequency) recurringFrequency.value = task.recurring.frequency;
+    if (recurringInterval) recurringInterval.value = task.recurring.interval || 1;
+  } else if (recurringToggle) {
+    recurringToggle.checked = false;
+    if (recurringOptions) recurringOptions.hidden = true;
+  }
 
   // Update button states
   if (submitBtn) {
@@ -335,6 +358,7 @@ export function clearForm() {
   const form = document.getElementById('task-form');
   const submitBtn = document.getElementById('submit-btn');
   const cancelBtn = document.getElementById('cancel-edit');
+  const recurringOptions = document.getElementById('recurring-options');
 
   if (!form) return;
 
@@ -343,6 +367,11 @@ export function clearForm() {
 
   // Remove edit mode data
   delete form.dataset.editingTaskId;
+
+  // Hide recurring options
+  if (recurringOptions) {
+    recurringOptions.hidden = true;
+  }
 
   // Update button states
   if (submitBtn) {
@@ -364,6 +393,9 @@ export function getFormData() {
   const prioritySelect = document.getElementById('task-priority');
   const dueDateInput = document.getElementById('task-due-date');
   const tagsInput = document.getElementById('task-tags');
+  const recurringToggle = document.getElementById('recurring-toggle');
+  const recurringFrequency = document.getElementById('recurring-frequency');
+  const recurringInterval = document.getElementById('recurring-interval');
 
   // Parse tags from comma-separated string
   let tags = [];
@@ -374,11 +406,21 @@ export function getFormData() {
       .filter(tag => tag.length > 0 && tag.length <= 20);
   }
 
+  // Parse recurring options
+  let recurring = null;
+  if (recurringToggle && recurringToggle.checked) {
+    recurring = {
+      frequency: recurringFrequency ? recurringFrequency.value : 'weekly',
+      interval: recurringInterval ? parseInt(recurringInterval.value) || 1 : 1
+    };
+  }
+
   return {
     title: titleInput ? titleInput.value.trim() : '',
     priority: prioritySelect ? prioritySelect.value : 'medium',
     dueDate: dueDateInput && dueDateInput.value ? dueDateInput.value : null,
-    tags
+    tags,
+    recurring
   };
 }
 

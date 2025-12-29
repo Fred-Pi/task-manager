@@ -633,3 +633,32 @@
   font-weight: var(--font-weight-medium);
   color: var(--color-primary);
 }
+
+/* Recurring Tasks */
+.recurring-options {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.recurring-indicator {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+  text-transform: capitalize;
+}
+
+.recurring-indicator .icon {
+  animation: rotate-icon 2s linear infinite;
+}
+
+@keyframes rotate-icon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
