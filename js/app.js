@@ -20,6 +20,7 @@ import { getTodayDateString } from './utils.js';
 import { initTheme, setupThemeToggle } from './theme.js';
 import { initNotificationChecking, setupNotificationToggle } from './notifications.js';
 import { initDragDrop, makeTasksDraggable, reorderTasks } from './dragDrop.js';
+import { initCalendar, renderCalendar, isCalendarVisible } from './calendar.js';
 
 // Application state
 let currentFilter = 'all';
@@ -70,8 +71,14 @@ function init() {
   // Initialize drag and drop
   initDragDrop();
 
+  // Initialize calendar
+  initCalendar();
+
   // Listen for task reorder events
   document.addEventListener('tasksReordered', handleTasksReordered);
+
+  // Listen for calendar day click events
+  document.addEventListener('calendarDayClicked', handleCalendarDayClicked);
 
   // Initial render
   refreshApp();
@@ -472,6 +479,11 @@ function refreshApp() {
     makeTasksDraggable(taskList);
   }
 
+  // Render calendar if visible
+  if (isCalendarVisible()) {
+    renderCalendar(allTasks);
+  }
+
   // Calculate and render statistics (always based on all tasks)
   const stats = calculateStatistics(allTasks);
   renderStatistics(stats);
@@ -499,6 +511,24 @@ function handleTasksReordered(event) {
   } catch (error) {
     console.error('Error reordering tasks:', error);
     showError('Failed to save new order');
+  }
+}
+
+/**
+ * Handle calendar day clicked event
+ * @param {CustomEvent} event - Calendar day click event
+ */
+function handleCalendarDayClicked(event) {
+  const { date, tasks } = event.detail;
+
+  if (tasks.length === 0) {
+    showSuccess(`No tasks scheduled for ${date}`);
+    announce(`No tasks for ${date}`);
+  } else {
+    const taskTitles = tasks.map(t => `- ${t.title}`).join('\n');
+    const message = `Tasks for ${date}:\n${taskTitles}`;
+    alert(message);
+    announce(`${tasks.length} tasks shown for ${date}`);
   }
 }
 
