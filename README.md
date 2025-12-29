@@ -14,6 +14,8 @@ A modern, accessible personal task management web application built with vanilla
   - Active and completed counts
   - Completion rate
   - Overdue tasks
+- **Dark Mode**: Toggle between light and dark themes with localStorage persistence
+- **Data Export/Import**: Export tasks as JSON for backup, import tasks from JSON files
 - **Responsive Design**: Works seamlessly on mobile, tablet, and desktop
 - **Accessibility**: WCAG compliant with keyboard navigation and screen reader support
 - **Data Persistence**: All data stored locally in the browser using localStorage
@@ -201,15 +203,15 @@ The app automatically offers to export your tasks as JSON before clearing data w
 
 Potential features for future versions:
 
-- Drag and drop task reordering
 - Task categories/tags
 - Subtasks
 - Recurring tasks
-- Dark mode toggle
-- Data export/import
-- Cloud synchronization
-- Notifications for due dates
+- Browser notifications for due dates
 - Calendar view
+- Drag and drop task reordering
+- Task search functionality
+- Bulk task operations
+- Cloud synchronization
 
 ## License
 
