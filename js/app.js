@@ -18,6 +18,7 @@ import {
 import { announce, initKeyboardNavigation } from './accessibility.js';
 import { getTodayDateString } from './utils.js';
 import { initTheme, setupThemeToggle } from './theme.js';
+import { initNotificationChecking, setupNotificationToggle } from './notifications.js';
 
 // Application state
 let currentFilter = 'all';
@@ -55,6 +56,12 @@ function init() {
 
   // Setup theme toggle
   setupThemeToggle();
+
+  // Setup notification toggle
+  setupNotificationToggle();
+
+  // Initialize notification checking
+  initNotificationChecking(getTasks);
 
   // Initialize keyboard navigation
   initKeyboardNavigation();
